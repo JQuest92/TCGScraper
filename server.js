@@ -71,7 +71,43 @@ app.get("/scrape", function(req, res) {
     });
 
     // Send a message to the client
-    res.send("Scrape Complete");
+   res.send("Scrape 1 Complete");
+   console.log("Ayyy lol");
+  });
+});
+
+app.get("/scrape2", function(req, res){
+    axios.get("https://ygorganization.com").then(function(response) {
+    // Then, we load that into cheerio and save it to $ for a shorthand selector
+    var $ = cheerio.load(response.data);
+    console.log("AYYY LMAO");
+    // Now, we grab every h2 within an article tag, and do the following:
+    $(".newsticker").each(function(i, element) {
+      // Save an empty result object
+      var result = {};
+
+      // Add the text and href of every link, and save them as properties of the result object
+      result.title = $(element)
+        .find("li")
+        .text();
+      result.link = $(element)
+        .find("a")
+        .attr("href");
+
+      // Create a new Article using the `result` object built from scraping
+      db.Article.create(result)
+        .then(function(dbArticle) {
+          // View the added result in the console
+          console.log(dbArticle);
+        })
+        .catch(function(err) {
+          // If an error occurred, log it
+          console.log(err);
+        });
+    });
+
+    // Send a message to the client
+    res.send("Scrape 2 Complete");
   });
 });
 
